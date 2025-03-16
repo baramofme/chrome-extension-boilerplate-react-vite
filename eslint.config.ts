@@ -1,3 +1,4 @@
+import type { FixupConfigArray } from '@eslint/compat';
 import { fixupConfigRules } from '@eslint/compat';
 import { FlatCompat } from '@eslint/eslintrc';
 import js from '@eslint/js';
@@ -6,17 +7,17 @@ import jsxA11y from 'eslint-plugin-jsx-a11y';
 import eslintPluginPrettierRecommended from 'eslint-plugin-prettier/recommended';
 import reactPlugin from 'eslint-plugin-react';
 import globals from 'globals';
-import ts from 'typescript-eslint';
+import { config, configs as tsConfigs, parser as tsParser } from 'typescript-eslint';
 
-export default ts.config(
+export default config(
   // Shared configs
   js.configs.recommended,
-  ...ts.configs.recommended,
+  ...tsConfigs.recommended,
   jsxA11y.flatConfigs.recommended,
   eslintPluginImportX.flatConfigs.recommended,
   eslintPluginImportX.flatConfigs.typescript,
   eslintPluginPrettierRecommended,
-  ...fixupConfigRules(new FlatCompat().extends('plugin:react-hooks/recommended')),
+  ...fixupConfigRules(new FlatCompat().extends('plugin:react-hooks/recommended') as FixupConfigArray),
   {
     files: ['**/*.{js,mjs,cjs,jsx,mjsx,ts,tsx,mtsx}'],
     ...reactPlugin.configs.flat.recommended,
@@ -30,7 +31,7 @@ export default ts.config(
   {
     files: ['**/*.{js,mjs,cjs,jsx,mjsx,ts,tsx,mtsx}'],
     languageOptions: {
-      parser: ts.parser,
+      parser: tsParser,
       ecmaVersion: 'latest',
       sourceType: 'module',
       parserOptions: {
@@ -51,9 +52,23 @@ export default ts.config(
     rules: {
       'react/react-in-jsx-scope': 'off',
       'import-x/no-unresolved': 'off',
-      'import-x/no-named-as-default-member': 'off',
       '@typescript-eslint/consistent-type-imports': 'error',
       'react/prop-types': 'off',
+      'import-x/order': [
+        'error',
+        {
+          'newlines-between': 'never',
+          alphabetize: { order: 'asc', caseInsensitive: true },
+        },
+      ],
+      'prefer-const': 'error',
+      'no-var': 'error',
+      'import-x/named': 'error',
+      'import-x/namespace': 'error',
+      'import-x/default': 'error',
+      'import-x/export': 'error',
+      'import-x/no-named-as-default': 'error',
+      'func-style': ['error', 'expression', { allowArrowFunctions: true }],
     },
     linterOptions: {
       reportUnusedDisableDirectives: 'error',

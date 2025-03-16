@@ -1,5 +1,5 @@
-import { useSyncExternalStore } from 'react';
 import type { BaseStorage } from '@extension/storage';
+import { useRef, useSyncExternalStore } from 'react';
 
 type WrappedPromise = ReturnType<typeof wrapPromise>;
 // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -11,13 +11,15 @@ export const useStorage = <
 >(
   storage: Storage,
 ) => {
+  const initializedRef = useRef(false);
   const _data = useSyncExternalStore<Data | null>(storage.subscribe, storage.getSnapshot);
 
   if (!storageMap.has(storage)) {
     storageMap.set(storage, wrapPromise(storage.get()));
   }
-  if (_data !== null) {
+  if (_data !== null || initializedRef.current) {
     storageMap.set(storage, { read: () => _data });
+    initializedRef.current = true;
   }
 
   return (_data ?? storageMap.get(storage)!.read()) as Exclude<Data, PromiseLike<unknown>>;
